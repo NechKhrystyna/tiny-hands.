@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="tiny hands">
 <meta name="description" content="a tiny place to draw what you feel.">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" href="/icons/icon-192.png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -270,6 +270,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .chips{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
 .chip{pointer-events:auto;height:36px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.92);display:flex;align-items:center;gap:6px;font-size:11px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
 .chip svg{width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round}
+.refmini{display:flex;align-items:center;gap:8px;min-width:0}
+.refmini img{width:40px;height:40px;border-radius:10px;object-fit:cover;cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+.refmini button{font-size:12px;color:var(--blue);font-weight:500;height:44px;padding:0 4px}
+.tbfinish{height:44px;padding:0 16px;border-radius:999px;background:var(--blue);color:#fff;font:inherit;font-size:13px;font-weight:500;transition:opacity .2s}
+.tbfinish:disabled{background:#E4E1F8;color:#9C97D8}
+.drawhint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);z-index:3;text-align:center;background:rgba(255,255,255,.92);border-radius:14px;padding:8px 14px;font-size:12px;line-height:17px;color:var(--grey);white-space:pre-line;pointer-events:none;transition:opacity .8s ease}
+.drawhint.gone{opacity:0}
+#s-draw .tools{margin-top:8px}#s-draw .sizerow{margin-top:6px;height:44px}#s-draw .drawcolors{margin:6px 0 0}
 .refbar{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:var(--r-card);padding:8px 16px 8px 8px;margin-bottom:12px;flex:none}
 .refbar img{width:56px;height:56px;border-radius:12px;object-fit:cover}
 .refbar .t{flex:1}
@@ -442,11 +450,9 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 
 <!-- draw -->
 <section class="screen" id="s-draw">
-  <div class="topbar"><button class="ibtn" id="drawBack" aria-label="back"><svg class="ico" viewBox="0 0 24 24"><path d="M15 5 L8 12 L15 19"/></svg></button><span class="mid" id="drawMid">blank page</span>
-    <div style="display:flex;gap:8px"><button class="ibtn" id="undo" disabled aria-label="undo"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6.5 L5 10.5 L9 14.5 M5 10.5 H15 Q19 10.5 19 14.5 Q19 18.5 15 18.5 H12"/></svg></button><button class="ibtn" id="redo" disabled aria-label="redo"><svg class="ico" viewBox="0 0 24 24"><path d="M15 6.5 L19 10.5 L15 14.5 M19 10.5 H9 Q5 10.5 5 14.5 Q5 18.5 9 18.5 H12"/></svg></button></div></div>
-  <div class="subtitle" id="drawSub"></div>
-  <div class="refbar" id="refbar" hidden><img id="refImg" alt=""><div class="t"><div class="label" id="refName"></div><div class="caption">tap to see it bigger</div></div><button class="label" style="color:var(--blue);height:44px" data-go="library">change</button></div>
-  <div class="canvaswrap" id="cwrap">
+  <div class="topbar"><button class="ibtn" id="drawBack" aria-label="back"><svg class="ico" viewBox="0 0 24 24"><path d="M15 5 L8 12 L15 19"/></svg></button><span class="mid" id="drawMid">blank page</span><span class="refmini" id="refMini" hidden><img id="refImg" alt="picture you're drawing from"><button id="refChange" data-go="library">change</button></span>
+    <div style="display:flex;gap:6px;align-items:center"><button class="ibtn" id="undo" disabled aria-label="undo"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6.5 L5 10.5 L9 14.5 M5 10.5 H15 Q19 10.5 19 14.5 Q19 18.5 15 18.5 H12"/></svg></button><button class="ibtn" id="redo" disabled aria-label="redo"><svg class="ico" viewBox="0 0 24 24"><path d="M15 6.5 L19 10.5 L15 14.5 M19 10.5 H9 Q5 10.5 5 14.5 Q5 18.5 9 18.5 H12"/></svg></button><button class="tbfinish" id="finish" disabled>finish</button></div></div>
+  <div class="canvaswrap" id="cwrap"><div class="drawhint" id="drawSub"></div>
     <div class="guide" id="guide" hidden></div><img id="picGuide" hidden alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;transition:opacity .4s">
     <canvas id="cv"></canvas>
     <div class="chips" id="ideaChips" hidden><button class="chip" id="ideaChip" style="max-width:100%"><span>💭</span><span id="ideaTxt"></span><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M19 12 A7 7 0 1 1 16.8 6.9 M19.5 4.5 V8.5 H15.5"/></svg></button></div>
@@ -456,7 +462,6 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
   <div class="tools" id="tools"></div>
   <div class="sizerow"><i id="szMin" style="width:5px;height:5px"></i><input type="range" id="size" min="2" max="24" value="7" aria-label="brush size"><i id="szMax" style="width:16px;height:16px"></i><span class="sep"></span><button class="label" id="opBtn" style="height:44px;white-space:nowrap">opacity 100%</button></div>
   <div class="colors drawcolors" id="penColors"></div>
-  <div class="actions"><button class="btn primary" id="finish" disabled>finish</button></div>
 </section>
 
 <!-- library -->
@@ -717,8 +722,8 @@ function syncPen(){const col=pen.tool==="eraser"?"#6B6862":pen.color;document.do
 function openDraw(){
   const sub={idea:"draw anything from your head —\nno need to explain it",blank:"draw what's on your mind —\nit doesn't need to be pretty",trace:"go slowly along the lines.\nbreathe out as you draw.",inspo:"draw your own version —\nit's okay if it looks different"}[mode];
   $("#drawSub").innerText=sub;$("#drawMid").textContent=mode==="trace"?"tracing · "+stencil:mode==="inspo"?(own.includes(refItem)?"your photo":"moodboard"):mode==="idea"?"your idea":"blank page";
-  $("#refbar").hidden=mode!=="inspo";$("#ideaChips").hidden=!(mode==="idea"||mode==="blank");if(mode==="idea")$("#ideaTxt").textContent=IDEAS[ideaI];if(mode==="blank")$("#ideaTxt").textContent="try a prompt";sessStart=Date.now();$("#picChips").hidden=mode!=="inspo";$("#picGuide").hidden=true;if(mode==="inspo"&&refItem){picState=-1;setTimeout(()=>cyclePic(),60);}$("#guide").hidden=mode!=="trace";$("#traceChips").hidden=mode!=="trace";
-  if(mode==="inspo"&&refItem){$("#refImg").src=refItem.src;$("#refName").textContent=refItem.n;}
+  $("#refMini").hidden=mode!=="inspo";$("#drawMid").hidden=mode==="inspo";const dh=$("#drawSub");dh.classList.remove("gone");clearTimeout(window._dhT);window._dhT=setTimeout(()=>dh.classList.add("gone"),4500);$("#ideaChips").hidden=!(mode==="idea"||mode==="blank");if(mode==="idea")$("#ideaTxt").textContent=IDEAS[ideaI];if(mode==="blank")$("#ideaTxt").textContent="try a prompt";sessStart=Date.now();$("#picChips").hidden=mode!=="inspo";$("#picGuide").hidden=true;if(mode==="inspo"&&refItem){picState=-1;setTimeout(()=>cyclePic(),60);}$("#guide").hidden=mode!=="trace";$("#traceChips").hidden=mode!=="trace";
+  if(mode==="inspo"&&refItem){$("#refImg").src=refItem.src;$("#refImg").alt=refItem.n;}
   if(mode==="trace"){$("#guide").innerHTML=svg(stencil,100,"currentColor",1.4);$("#guide").style.opacity=guideOp;}
   if(mood)pen.color=moodOf(mood).c;syncPen();updBtns();show("draw");}
 function sizeCanvas(){const r=$("#cwrap").getBoundingClientRect();DPR=Math.min(window.devicePixelRatio||1,2.5);W=r.width;H=r.height;cv.width=base.width=Math.round(W*DPR);cv.height=base.height=Math.round(H*DPR);rebuild();}
@@ -736,7 +741,7 @@ cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);curStrok
 cv.addEventListener("pointermove",e=>{if(!curStroke)return;const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];for(const ev of evs)curStroke.pts.push(pt(ev));paint();});
 const endStroke=()=>{if(!curStroke)return;strokes.push(curStroke);drawStroke(bctx,curStroke,base.width,base.height);curStroke=null;redoStack=[];paint();updBtns();};
 cv.addEventListener("pointerup",endStroke);cv.addEventListener("pointercancel",endStroke);
-function updBtns(){$("#undo").disabled=!strokes.length;$("#redo").disabled=!redoStack.length;$("#finish").disabled=!strokes.some(s=>s.tool!=="eraser");}
+function updBtns(){if(strokes.length)$("#drawSub").classList.add("gone");$("#undo").disabled=!strokes.length;$("#redo").disabled=!redoStack.length;$("#finish").disabled=!strokes.some(s=>s.tool!=="eraser");}
 $("#undo").onclick=()=>{haptic();redoStack.push(strokes.pop());rebuild();updBtns();};
 $("#redo").onclick=()=>{haptic();strokes.push(redoStack.pop());rebuild();updBtns();};
 $("#drawBack").onclick=()=>{if(strokes.length)openSheet("leave");else if(mode==="inspo"&&libSel&&own.indexOf(libSel)<0)show("library",true);else show("choose",true);};
