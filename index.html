@@ -270,6 +270,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .chips{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
 .chip{pointer-events:auto;height:36px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.92);display:flex;align-items:center;gap:6px;font-size:11px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
 .chip svg{width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round}
+.chip .chipthumb{width:22px;height:22px;border-radius:6px;object-fit:cover;margin-left:-4px}
 .refmini{display:flex;align-items:center;gap:8px;min-width:0}
 .refmini img{width:40px;height:40px;border-radius:10px;object-fit:cover;cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
 .refmini button{font-size:12px;color:var(--blue);font-weight:500;height:44px;padding:0 4px}
@@ -277,7 +278,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tbfinish:disabled{background:#E4E1F8;color:#9C97D8}
 .drawhint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);z-index:3;text-align:center;background:rgba(255,255,255,.92);border-radius:14px;padding:8px 14px;font-size:12px;line-height:17px;color:var(--grey);white-space:pre-line;pointer-events:none;transition:opacity .8s ease}
 .drawhint.gone{opacity:0}
-#s-draw .tools{margin-top:8px}#s-draw .sizerow{margin-top:6px;height:44px}#s-draw .drawcolors{margin:6px 0 0}
+#s-draw .topbar{margin-bottom:12px}#s-draw .topbar .ibtn{width:40px;height:40px}#s-draw .tbfinish{height:40px;padding:0 14px}
+#s-draw .tools{margin-top:12px}#s-draw .sizerow{margin-top:8px;height:44px}#s-draw .drawcolors{margin:8px 0 0}
 .refbar{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:var(--r-card);padding:8px 16px 8px 8px;margin-bottom:12px;flex:none}
 .refbar img{width:56px;height:56px;border-radius:12px;object-fit:cover}
 .refbar .t{flex:1}
@@ -311,6 +313,8 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .ltile{text-align:left}
 .ltile .im{position:relative;height:160px;border-radius:var(--r-card);overflow:hidden;background:var(--bg);transition:box-shadow .2s}
 .ltile .im img{width:100%;height:100%;object-fit:cover}
+/* photos keep their top, crop from the bottom */
+.ltile .im img,.optimg,.chip .chipthumb,.mbstrip img,.obcal img,.viewer img{object-position:50% 0}
 .ltile.on .im{box-shadow:inset 0 0 0 2px var(--blue)}
 .ltile .ck{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:var(--blue);display:grid;place-items:center;opacity:0;transform:scale(.6);transition:.25s var(--ease)}
 .ltile.on .ck{opacity:1;transform:none}
@@ -450,13 +454,13 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 
 <!-- draw -->
 <section class="screen" id="s-draw">
-  <div class="topbar"><button class="ibtn" id="drawBack" aria-label="back"><svg class="ico" viewBox="0 0 24 24"><path d="M15 5 L8 12 L15 19"/></svg></button><span class="mid" id="drawMid">blank page</span><span class="refmini" id="refMini" hidden><img id="refImg" alt="picture you're drawing from"><button id="refChange" data-go="library">change</button></span>
+  <div class="topbar"><button class="ibtn" id="drawBack" aria-label="back"><svg class="ico" viewBox="0 0 24 24"><path d="M15 5 L8 12 L15 19"/></svg></button><span class="mid" id="drawMid">blank page</span>
     <div style="display:flex;gap:6px;align-items:center"><button class="ibtn" id="undo" disabled aria-label="undo"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6.5 L5 10.5 L9 14.5 M5 10.5 H15 Q19 10.5 19 14.5 Q19 18.5 15 18.5 H12"/></svg></button><button class="ibtn" id="redo" disabled aria-label="redo"><svg class="ico" viewBox="0 0 24 24"><path d="M15 6.5 L19 10.5 L15 14.5 M19 10.5 H9 Q5 10.5 5 14.5 Q5 18.5 9 18.5 H12"/></svg></button><button class="tbfinish" id="finish" disabled>finish</button></div></div>
   <div class="canvaswrap" id="cwrap"><div class="drawhint" id="drawSub"></div>
-    <div class="guide" id="guide" hidden></div><img id="picGuide" hidden alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;transition:opacity .4s">
+    <div class="guide" id="guide" hidden></div><img id="picGuide" hidden alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;box-sizing:border-box;pointer-events:none;transition:opacity .4s">
     <canvas id="cv"></canvas>
     <div class="chips" id="ideaChips" hidden><button class="chip" id="ideaChip" style="max-width:100%"><span>💭</span><span id="ideaTxt"></span><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M19 12 A7 7 0 1 1 16.8 6.9 M19.5 4.5 V8.5 H15.5"/></svg></button></div>
-    <div class="chips" id="picChips" hidden><span></span><button class="chip" id="picTrace"><svg class="ico" viewBox="0 0 24 24"><path d="M2.5 12 Q7 5 12 5 Q17 5 21.5 12 Q17 19 12 19 Q7 19 2.5 12 Z"/><circle cx="12" cy="12" r="3"/></svg><span id="picTxt">sketch on</span></button></div>
+    <div class="chips" id="picChips" hidden><button class="chip" id="picChange" data-go="library"><img id="refImg" class="chipthumb" alt="">change</button><button class="chip" id="picTrace"><svg class="ico" viewBox="0 0 24 24"><path d="M2.5 12 Q7 5 12 5 Q17 5 21.5 12 Q17 19 12 19 Q7 19 2.5 12 Z"/><circle cx="12" cy="12" r="3"/></svg><span id="picTxt">sketch on</span></button></div>
     <div class="chips" id="traceChips" hidden><button class="chip" id="guideChip"><svg class="ico" viewBox="0 0 24 24"><path d="M2.5 12 Q7 5 12 5 Q17 5 21.5 12 Q17 19 12 19 Q7 19 2.5 12 Z"/><circle cx="12" cy="12" r="3"/></svg><span id="guideTxt">guide 35%</span></button><button class="chip" id="otherSt"><svg class="ico" viewBox="0 0 24 24"><path d="M19 12 A7 7 0 1 1 16.8 6.9 M19.5 4.5 V8.5 H15.5"/></svg>other stencil</button></div>
   </div>
   <div class="tools" id="tools"></div>
@@ -722,7 +726,7 @@ function syncPen(){const col=pen.tool==="eraser"?"#6B6862":pen.color;document.do
 function openDraw(){
   const sub={idea:"draw anything from your head —\nno need to explain it",blank:"draw what's on your mind —\nit doesn't need to be pretty",trace:"go slowly along the lines.\nbreathe out as you draw.",inspo:"draw your own version —\nit's okay if it looks different"}[mode];
   $("#drawSub").innerText=sub;$("#drawMid").textContent=mode==="trace"?"tracing · "+stencil:mode==="inspo"?(own.includes(refItem)?"your photo":"moodboard"):mode==="idea"?"your idea":"blank page";
-  $("#refMini").hidden=mode!=="inspo";$("#drawMid").hidden=mode==="inspo";const dh=$("#drawSub");dh.classList.remove("gone");clearTimeout(window._dhT);window._dhT=setTimeout(()=>dh.classList.add("gone"),4500);$("#ideaChips").hidden=!(mode==="idea"||mode==="blank");if(mode==="idea")$("#ideaTxt").textContent=IDEAS[ideaI];if(mode==="blank")$("#ideaTxt").textContent="try a prompt";sessStart=Date.now();$("#picChips").hidden=mode!=="inspo";$("#picGuide").hidden=true;if(mode==="inspo"&&refItem){picState=-1;setTimeout(()=>cyclePic(),60);}$("#guide").hidden=mode!=="trace";$("#traceChips").hidden=mode!=="trace";
+  const dh=$("#drawSub");dh.classList.remove("gone");clearTimeout(window._dhT);window._dhT=setTimeout(()=>dh.classList.add("gone"),4500);$("#ideaChips").hidden=!(mode==="idea"||mode==="blank");if(mode==="idea")$("#ideaTxt").textContent=IDEAS[ideaI];if(mode==="blank")$("#ideaTxt").textContent="try a prompt";sessStart=Date.now();$("#picChips").hidden=mode!=="inspo";$("#picGuide").hidden=true;if(mode==="inspo"&&refItem){picState=-1;setTimeout(()=>cyclePic(),60);}$("#guide").hidden=mode!=="trace";$("#traceChips").hidden=mode!=="trace";
   if(mode==="inspo"&&refItem){$("#refImg").src=refItem.src;$("#refImg").alt=refItem.n;}
   if(mode==="trace"){$("#guide").innerHTML=svg(stencil,100,"currentColor",1.4);$("#guide").style.opacity=guideOp;}
   if(mood)pen.color=moodOf(mood).c;syncPen();updBtns();show("draw");}
@@ -749,22 +753,23 @@ $("#keepDrawing").onclick=()=>closeSheet();
 $("#leaveDrawing").onclick=()=>{closeSheet();strokes=[];redoStack=[];show("choose",true);};
 $("#guideChip").onclick=()=>{guideOp=guideOp>.3?.15:guideOp>.1?0:.35;$("#guide").style.opacity=guideOp;$("#guideTxt").textContent=guideOp?"guide "+Math.round(guideOp*100)+"%":"guide off";};
 let picState=-1;const sketchCache={};
-function makeSketch(src,W,H){const key=src.slice(-40)+W+"x"+H;if(sketchCache[key])return Promise.resolve(sketchCache[key]);
+function makeSketch(src,W,H){const key="v2"+src.slice(-40)+W+"x"+H;if(sketchCache[key])return Promise.resolve(sketchCache[key]);
  return loadImg(src).then(img=>{const w=Math.round(W),h=Math.round(H);const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d",{willReadFrequently:true});
-  const sc=Math.max(w/img.width,h/img.height),iw=img.width*sc,ih=img.height*sc;x.filter="blur(1.2px)";x.drawImage(img,(w-iw)/2,(h-ih)/2,iw,ih);x.filter="none";
+  const sc=Math.min(w/img.width,h/img.height)*.86,iw=img.width*sc,ih=img.height*sc;x.filter="blur(1.2px)";x.drawImage(img,(w-iw)/2,(h-ih)/2,iw,ih);x.filter="none";
   const d=x.getImageData(0,0,w,h).data,g=new Float32Array(w*h);for(let p=0,q=0;p<d.length;p+=4,q++)g[q]=.3*d[p]+.59*d[p+1]+.11*d[p+2];
   const out=x.createImageData(w,h),o=out.data;
-  for(let yy=1;yy<h-1;yy++)for(let xx=1;xx<w-1;xx++){const k=yy*w+xx;
+  const X0=(w-iw)/2+4,X1=(w+iw)/2-4,Y0=(h-ih)/2+4,Y1=(h+ih)/2-4;
+  for(let yy=1;yy<h-1;yy++)for(let xx=1;xx<w-1;xx++){if(xx<X0||xx>X1||yy<Y0||yy>Y1)continue;const k=yy*w+xx;
    const gx=-g[k-w-1]-2*g[k-1]-g[k+w-1]+g[k-w+1]+2*g[k+1]+g[k+w+1],gy=-g[k-w-1]-2*g[k-w]-g[k-w+1]+g[k+w-1]+2*g[k+w]+g[k+w+1];
    const m=Math.sqrt(gx*gx+gy*gy);if(m>60){const a=Math.min(1,(m-60)/120);const i4=k*4;o[i4]=110;o[i4+1]=104;o[i4+2]=96;o[i4+3]=Math.round(a*200);}}
   x.putImageData(out,0,0);return sketchCache[key]=c.toDataURL();});}
 async function cyclePic(){haptic&&0;const g=$("#picGuide");picState=(picState+1)%3;
- if(picState===0){const r=$("#cwrap").getBoundingClientRect();g.src=await makeSketch(refItem.src,Math.min(r.width,520),Math.min(r.width,520)*r.height/r.width);g.style.opacity=.85;g.hidden=false;$("#picTxt").textContent="sketch";$("#drawSub").innerText="trace the sketch,\nthen color it your way";}
- else if(picState===1){g.src=refItem.src;g.style.opacity=.22;g.hidden=false;$("#picTxt").textContent="faint photo";$("#drawSub").innerText="color it in, piece by piece —\nthe picture stays faint underneath";}
+ if(picState===0){const r=$("#cwrap").getBoundingClientRect();g.style.padding="0";g.src=await makeSketch(refItem.src,Math.min(r.width,520),Math.min(r.width,520)*r.height/r.width);g.style.opacity=.85;g.hidden=false;$("#picTxt").textContent="sketch";$("#drawSub").innerText="trace the sketch,\nthen color it your way";}
+ else if(picState===1){g.style.padding="7%";g.src=refItem.src;g.style.opacity=.22;g.hidden=false;$("#picTxt").textContent="faint photo";$("#drawSub").innerText="color it in, piece by piece —\nthe picture stays faint underneath";}
  else{g.hidden=true;$("#picTxt").textContent="no guide";$("#drawSub").innerText="draw your own version —\nit's okay if it looks different";}}
 $("#picTrace").onclick=()=>{haptic();cyclePic();};
 $("#otherSt").onclick=()=>openStencils();
-$("#refImg").onclick=()=>viewer(refItem.src,refItem.n);
+
 
 /* stencils */
 let stCat="nature";
