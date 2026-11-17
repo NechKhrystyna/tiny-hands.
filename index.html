@@ -262,8 +262,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* draw */
 .subtitle{text-align:center;font-size:13px;line-height:18px;color:var(--blue);font-weight:500;margin:6px 0 12px}
 .canvaswrap{position:relative;flex:1;min-height:0;border-radius:var(--r-card);overflow:hidden;background-color:var(--paper);
-  background-image:radial-gradient(#E9E5DD 1.2px,transparent 1.3px);background-size:18px 18px;background-position:9px 9px;border:1px solid var(--line)}
+  border:1px solid var(--line)}
 .canvaswrap canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.canvaswrap{touch-action:none}
+.zoomer{position:absolute;inset:0;transform-origin:0 0;will-change:transform;background-image:radial-gradient(#E9E5DD 1.2px,transparent 1.3px);background-size:18px 18px;background-position:9px 9px}
+.zoomer.anim{transition:transform .3s var(--ease)}
+.zoomctl{position:absolute;right:10px;bottom:10px;z-index:4;display:flex;align-items:center;height:36px;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 4px 12px rgba(0,0,0,.06);overflow:hidden}
+.zoomctl button{height:36px;min-width:36px;padding:0 8px;font:inherit;font-size:15px;color:var(--ink)}
+.zoomctl #zFit{font-size:11px;min-width:46px;color:var(--grey)}
+.zoomctl.zoomed #zFit{color:var(--blue);font-weight:500}
 .guide{position:absolute;inset:8%;width:84%;height:84%;color:#9E978A;pointer-events:none;transition:opacity .4s}
 .guide svg{width:100%;height:100%}
 .guide svg *{vector-effect:non-scaling-stroke;stroke-width:2.2px;stroke-dasharray:2 7}
@@ -276,7 +283,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .refmini button{font-size:12px;color:var(--blue);font-weight:500;height:44px;padding:0 4px}
 .tbfinish{height:44px;padding:0 16px;border-radius:999px;background:var(--blue);color:#fff;font:inherit;font-size:13px;font-weight:500;transition:opacity .2s}
 .tbfinish:disabled{background:#E4E1F8;color:#9C97D8}
-.drawhint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);z-index:3;text-align:center;background:rgba(255,255,255,.92);border-radius:14px;padding:8px 14px;font-size:12px;line-height:17px;color:var(--grey);white-space:pre-line;pointer-events:none;transition:opacity .8s ease}
+.drawhint{position:absolute;left:50%;bottom:56px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);z-index:3;text-align:center;background:rgba(255,255,255,.92);border-radius:14px;padding:8px 14px;font-size:12px;line-height:17px;color:var(--grey);white-space:pre-line;pointer-events:none;transition:opacity .8s ease}
 .drawhint.gone{opacity:0}
 #s-draw .topbar{margin-bottom:12px}#s-draw .topbar .ibtn{width:40px;height:40px}#s-draw .tbfinish{height:40px;padding:0 14px}
 #s-draw .tools{margin-top:12px}#s-draw .sizerow{margin-top:8px;height:44px}#s-draw .drawcolors{margin:8px 0 0}
@@ -457,8 +464,9 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
   <div class="topbar"><button class="ibtn" id="drawBack" aria-label="back"><svg class="ico" viewBox="0 0 24 24"><path d="M15 5 L8 12 L15 19"/></svg></button><span class="mid" id="drawMid">blank page</span>
     <div style="display:flex;gap:6px;align-items:center"><button class="ibtn" id="undo" disabled aria-label="undo"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6.5 L5 10.5 L9 14.5 M5 10.5 H15 Q19 10.5 19 14.5 Q19 18.5 15 18.5 H12"/></svg></button><button class="ibtn" id="redo" disabled aria-label="redo"><svg class="ico" viewBox="0 0 24 24"><path d="M15 6.5 L19 10.5 L15 14.5 M19 10.5 H9 Q5 10.5 5 14.5 Q5 18.5 9 18.5 H12"/></svg></button><button class="tbfinish" id="finish" disabled>finish</button></div></div>
   <div class="canvaswrap" id="cwrap"><div class="drawhint" id="drawSub"></div>
-    <div class="guide" id="guide" hidden></div><img id="picGuide" hidden alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;box-sizing:border-box;pointer-events:none;transition:opacity .4s">
-    <canvas id="cv"></canvas>
+    <div class="zoomer" id="zoomer"><div class="guide" id="guide" hidden></div><img id="picGuide" hidden alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;box-sizing:border-box;pointer-events:none;transition:opacity .4s">
+    <canvas id="cv"></canvas></div>
+    <div class="zoomctl" id="zoomCtl"><button id="zOut" aria-label="zoom out">−</button><button id="zFit" aria-label="fit to screen">100%</button><button id="zIn" aria-label="zoom in">+</button></div>
     <div class="chips" id="ideaChips" hidden><button class="chip" id="ideaChip" style="max-width:100%"><span>💭</span><span id="ideaTxt"></span><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M19 12 A7 7 0 1 1 16.8 6.9 M19.5 4.5 V8.5 H15.5"/></svg></button></div>
     <div class="chips" id="picChips" hidden><button class="chip" id="picChange" data-go="library"><img id="refImg" class="chipthumb" alt="">change</button><button class="chip" id="picTrace"><svg class="ico" viewBox="0 0 24 24"><path d="M2.5 12 Q7 5 12 5 Q17 5 21.5 12 Q17 19 12 19 Q7 19 2.5 12 Z"/><circle cx="12" cy="12" r="3"/></svg><span id="picTxt">sketch on</span></button></div>
     <div class="chips" id="traceChips" hidden><button class="chip" id="guideChip"><svg class="ico" viewBox="0 0 24 24"><path d="M2.5 12 Q7 5 12 5 Q17 5 21.5 12 Q17 19 12 19 Q7 19 2.5 12 Z"/><circle cx="12" cy="12" r="3"/></svg><span id="guideTxt">guide 35%</span></button><button class="chip" id="otherSt"><svg class="ico" viewBox="0 0 24 24"><path d="M19 12 A7 7 0 1 1 16.8 6.9 M19.5 4.5 V8.5 H15.5"/></svg>other stencil</button></div>
@@ -729,8 +737,8 @@ function openDraw(){
   const dh=$("#drawSub");dh.classList.remove("gone");clearTimeout(window._dhT);window._dhT=setTimeout(()=>dh.classList.add("gone"),4500);$("#ideaChips").hidden=!(mode==="idea"||mode==="blank");if(mode==="idea")$("#ideaTxt").textContent=IDEAS[ideaI];if(mode==="blank")$("#ideaTxt").textContent="try a prompt";sessStart=Date.now();$("#picChips").hidden=mode!=="inspo";$("#picGuide").hidden=true;if(mode==="inspo"&&refItem){picState=-1;setTimeout(()=>cyclePic(),60);}$("#guide").hidden=mode!=="trace";$("#traceChips").hidden=mode!=="trace";
   if(mode==="inspo"&&refItem){$("#refImg").src=refItem.src;$("#refImg").alt=refItem.n;}
   if(mode==="trace"){$("#guide").innerHTML=svg(stencil,100,"currentColor",1.4);$("#guide").style.opacity=guideOp;}
-  if(mood)pen.color=moodOf(mood).c;syncPen();updBtns();show("draw");}
-function sizeCanvas(){const r=$("#cwrap").getBoundingClientRect();DPR=Math.min(window.devicePixelRatio||1,2.5);W=r.width;H=r.height;cv.width=base.width=Math.round(W*DPR);cv.height=base.height=Math.round(H*DPR);rebuild();}
+  if(mood)pen.color=moodOf(mood).c;syncPen();updBtns();show("draw");Z.s=1;Z.x=0;Z.y=0;zApply();}
+function sizeCanvas(){const r=$("#cwrap").getBoundingClientRect();DPR=Math.min((window.devicePixelRatio||1)*1.6,4);W=r.width;H=r.height;cv.width=base.width=Math.round(W*DPR);cv.height=base.height=Math.round(H*DPR);rebuild();}
 window.addEventListener("resize",()=>{if(cur&&cur.id==="s-draw")sizeCanvas();});
 function drawStroke(c,s,w,h,scale=1){const t=TOOLS[s.tool];c.save();c.globalCompositeOperation=s.tool==="eraser"?"destination-out":"source-over";c.globalAlpha=t.a*(s.op||1);c.strokeStyle=c.fillStyle=s.color;
  const lw=Math.max(1,s.size/408*w*t.m);c.lineWidth=lw;c.lineCap=c.lineJoin="round";const pts=s.pts.map(p=>[p[0]*w,p[1]*h]);
@@ -741,10 +749,28 @@ function drawStroke(c,s,w,h,scale=1){const t=TOOLS[s.tool];c.save();c.globalComp
 function rebuild(){bctx.setTransform(1,0,0,1,0,0);bctx.clearRect(0,0,base.width,base.height);for(const s of strokes)drawStroke(bctx,s,base.width,base.height);paint();}
 function paint(){ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(base,0,0);if(curStroke)drawStroke(ctx,curStroke,cv.width,cv.height);}
 function pt(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height];}
-cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);curStroke={tool:pen.tool,color:pen.color,size:pen.size,op:pen.tool==="eraser"?1:pen.op,pts:[pt(e)]};paint();});
-cv.addEventListener("pointermove",e=>{if(!curStroke)return;const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];for(const ev of evs)curStroke.pts.push(pt(ev));paint();});
+/* zoom & pan: two fingers pinch/move, one finger draws */
+const Z={s:1,x:0,y:0};const ptrs=new Map();let pinch=null,blockDraw=false;
+function zApply(anim){const zr=$("#zoomer");zr.classList.toggle("anim",!!anim);const r=$("#cwrap").getBoundingClientRect();
+ Z.s=Math.min(5,Math.max(1,Z.s));Z.x=Math.min(0,Math.max(r.width-r.width*Z.s,Z.x));Z.y=Math.min(0,Math.max(r.height-r.height*Z.s,Z.y));
+ zr.style.transform=`translate(${Z.x}px,${Z.y}px) scale(${Z.s})`;$("#zFit").textContent=Math.round(Z.s*100)+"%";$("#zoomCtl").classList.toggle("zoomed",Z.s>1.01);}
+function zTo(ns,cx,cy,anim){const r=$("#cwrap").getBoundingClientRect();if(cx==null){cx=r.width/2;cy=r.height/2;}const px=(cx-Z.x)/Z.s,py=(cy-Z.y)/Z.s;Z.s=Math.min(5,Math.max(1,ns));Z.x=cx-px*Z.s;Z.y=cy-py*Z.s;zApply(anim);}
+function zReset(){Z.s=1;Z.x=0;Z.y=0;zApply(true);}
+$("#zIn").onclick=()=>{haptic();zTo(Z.s*1.5,null,null,true);};$("#zOut").onclick=()=>{haptic();zTo(Z.s/1.5,null,null,true);};$("#zFit").onclick=()=>{haptic();zReset();};
+function local(e){const r=$("#cwrap").getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+function pinchState(){const [a,b]=[...ptrs.values()];return{d:Math.hypot(a.x-b.x,a.y-b.y)||1,mx:(a.x+b.x)/2,my:(a.y+b.y)/2};}
+$("#cwrap").addEventListener("wheel",e=>{if(!$("#s-draw").classList.contains("active"))return;e.preventDefault();const p=local(e);
+ if(e.ctrlKey||e.metaKey)zTo(Z.s*Math.exp(-e.deltaY*.01),p.x,p.y);else if(Z.s>1){Z.x-=e.deltaX;Z.y-=e.deltaY;zApply();}},{passive:false});
+cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,local(e));
+ if(ptrs.size===2){curStroke=null;paint();const p=pinchState();pinch={d0:p.d,s0:Z.s,px:(p.mx-Z.x)/Z.s,py:(p.my-Z.y)/Z.s};return;}
+ if(ptrs.size>2||pinch||blockDraw)return;
+ curStroke={tool:pen.tool,color:pen.color,size:pen.size,op:pen.tool==="eraser"?1:pen.op,pts:[pt(e)]};paint();});
+cv.addEventListener("pointermove",e=>{if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,local(e));
+ if(pinch&&ptrs.size>=2){const p=pinchState();Z.s=Math.min(5,Math.max(1,pinch.s0*p.d/pinch.d0));Z.x=p.mx-pinch.px*Z.s;Z.y=p.my-pinch.py*Z.s;zApply();return;}
+ if(!curStroke)return;const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];for(const ev of evs)curStroke.pts.push(pt(ev));paint();});
 const endStroke=()=>{if(!curStroke)return;strokes.push(curStroke);drawStroke(bctx,curStroke,base.width,base.height);curStroke=null;redoStack=[];paint();updBtns();};
-cv.addEventListener("pointerup",endStroke);cv.addEventListener("pointercancel",endStroke);
+const ptrEnd=e=>{ptrs.delete(e.pointerId);if(pinch){if(ptrs.size<2){pinch=null;blockDraw=ptrs.size>0;if(Z.s<1.05)zReset();}return;}if(!ptrs.size)blockDraw=false;endStroke();};
+cv.addEventListener("pointerup",ptrEnd);cv.addEventListener("pointercancel",ptrEnd);
 function updBtns(){if(strokes.length)$("#drawSub").classList.add("gone");$("#undo").disabled=!strokes.length;$("#redo").disabled=!redoStack.length;$("#finish").disabled=!strokes.some(s=>s.tool!=="eraser");}
 $("#undo").onclick=()=>{haptic();redoStack.push(strokes.pop());rebuild();updBtns();};
 $("#redo").onclick=()=>{haptic();strokes.push(redoStack.pop());rebuild();updBtns();};
